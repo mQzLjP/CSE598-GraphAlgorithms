@@ -1,0 +1,43 @@
+\chapter{Introduction}
+
+In this part we'll investigate 4 min-max theorems. In these theorems, a max property of a graph is often proved to be equal to a min property of the graph.
+
+We should be aware that such min-max theorems are not seen everywhere. For example:
+
+\begin{claim}
+	\[\text{Max Matching} \leq \text{Min Vertex Cover}\]
+\end{claim}
+\begin{proof}
+	Let $M$ be a matching and $C$ be a vertex cover. Then each edge in $M$ must have at least one endpoint in $C$. Since the edges in $M$ are disjoint, we have that $|M| \leq |C|$.
+\end{proof}
+
+The easiest counterexample to show that the above inequality can be strict is a triangle graph. The maximum matching has size 1, while the minimum vertex cover has size 2.
+
+Here we first list the 4 min-max theorems and prove the $\leq$ direction. Then we will prove the tightness in the next few chapters.
+
+\begin{claim}[Menger's Theorem]
+	In a unweighted graph $G$, the maximum number of edge-disjoint $s$-$t$ paths $\le$ the minimum $s$ - $t$ cut (i.e. the minimum number of edges whose removal disconnects $s$ and $t$).
+\end{claim}
+\begin{proof}
+	Let $P_1, P_2, \ldots, P_k$ be edge-disjoint $s$-$t$ paths. Let $C$ be an $s$-$t$ cut. Then each path $P_i$ must contain at least one edge in $C$. Since the paths are edge-disjoint, we have that $k \leq |C|$.
+\end{proof}
+
+\begin{claim}[Nash-William Theorem]
+	The maximum number of edge-disjoint spanning trees $\le \min \lfloor \frac{|E(P)|}{|P|-1} \rfloor$ over all partition $P$ of the graph.
+\end{claim}
+\begin{proof}
+	Let $T_1, T_2, \ldots, T_k$ be edge-disjoint spanning trees. Let $P$ be a partition of the graph. Then each spanning tree $T_i$ must contain at least $|P|-1$ edges in $E(P)$ as a spanning tree must touch all the components of the partition $P$. Since the spanning trees are edge-disjoint, we have that $k(|P|-1) \leq |E(P)|$, which implies that $k \leq \lfloor \frac{|E(P)|}{|P|-1} \rfloor$.
+\end{proof}
+
+\begin{note}
+	Intuitively we want to find an equality between the maximum number of disjoint spanning trees and the minimum global cut. However one can find the counterexample of it in $C_4$, with the maximum number of disjoint spanning trees being 1, while the minimum global cut is 2.
+\end{note}
+
+\begin{definition}
+	A $s$-arborescence in a directed graph is a spanning tree rooted at $s$ such that all vertices are reachable from $s$.
+\end{definition}
+\begin{claim}[Rooted Connectivity Theorem]
+	The maximum number of edge-disjoint $s$-arborescences $\le$ the minimum $s$ cut (i.e. the minimum number of edges whose removal disconnects $s$ and any vertex).
+\end{claim}
+
+We won't be focusing on this theorem. Instead we want to prove a weaker version in the next few chapters:
