@@ -15,12 +15,16 @@ The easiest counterexample to show that the above inequality can be strict is a 
 
 Here we first list the 4 min-max theorems and prove the $\leq$ direction. Then we will prove the tightness in the next few chapters.
 
+\section{Menger's Theorem}
+
 \begin{claim}[Menger's Theorem]
 	In a unweighted graph $G$, the maximum number of edge-disjoint $s$-$t$ paths $\le$ the minimum $s$ - $t$ cut (i.e. the minimum number of edges whose removal disconnects $s$ and $t$).
 \end{claim}
 \begin{proof}
 	Let $P_1, P_2, \ldots, P_k$ be edge-disjoint $s$-$t$ paths. Let $C$ be an $s$-$t$ cut. Then each path $P_i$ must contain at least one edge in $C$. Since the paths are edge-disjoint, we have that $k \leq |C|$.
 \end{proof}
+
+\section{Nash-Williams Theorem}
 
 \begin{claim}[Nash-William Theorem]
 	The maximum number of edge-disjoint spanning trees $\le \min \lfloor \frac{|E(P)|}{|P|-1} \rfloor$ over all partition $P$ of the graph.
@@ -33,11 +37,51 @@ Here we first list the 4 min-max theorems and prove the $\leq$ direction. Then w
 	Intuitively we want to find an equality between the maximum number of disjoint spanning trees and the minimum global cut. However one can find the counterexample of it in $C_4$, with the maximum number of disjoint spanning trees being 1, while the minimum global cut is 2.
 \end{note}
 
+\section{Edmonds' Theorem}
+
 \begin{definition}
-	A $s$-arborescence in a directed graph is a spanning tree rooted at $s$ such that all vertices are reachable from $s$.
+	A $s$\textbf{-arborescence} in a directed graph is a spanning tree rooted at $s$ such that all vertices are reachable from $s$.
 \end{definition}
 \begin{claim}[Rooted Connectivity Theorem]
 	The maximum number of edge-disjoint $s$-arborescences $\le$ the minimum $s$ cut (i.e. the minimum number of edges whose removal disconnects $s$ and any vertex).
 \end{claim}
 
-We won't be focusing on this theorem. Instead we want to prove a weaker version in the next few chapters:
+We won't be focusing on this theorem. Instead, we want to prove a weaker version in the next few chapters:
+
+\begin{definition}
+	A $k$ \textbf{bounded in-degree spanning tree} is a spanning tree packing in a directed graph with:
+	\begin{itemize}
+		\item $k$ edge-disjoint spanning trees $T_1, T_2, \ldots, T_k$.
+		\item Let $T = \bigcup_{i=1}^k T_i$. Then for all $t \neq s, \indeg_T(t) = k$.
+	\end{itemize}
+\end{definition}
+
+One can verify that the maximum number of edge-disjoint $s$-arborescences is at most the maximum number of $k$ bounded in-degree spanning trees.
+
+\begin{claim}
+	The maximum number of $k$ bounded in-degree spanning trees $\le$ the minimum $s$ cut.
+\end{claim}
+\begin{proof}
+	Let the minimum $s$ cut separate a set $X$ from $V\setminus X$, and $s\in V\setminus X$. As every spanning tree can contain at most $|X|-1$ edges in the subgraph induced by $X$, we have
+	\[|E_T(X)|\le k(|X|-1)\]
+	Also, as every vertex in $X$ have in degree $k$, we have
+	\[ \sum_{v\in X} \indeg_T(v) = k|X| \]
+	Combining the two inequalities, we have
+	\[ |E(V\setminus X, X)| = k|X| - |E_T(X)| \ge k|X| - k(|X|-1) = k \]
+	which implies that the minimum $s$ cut is at least $k$.
+\end{proof}
+
+\section{Max-Dicut Packing Min-Dijoin Theorem}
+
+\begin{definition}
+	A \textbf{dicut} is the edge set $\delta^{\text{out}}(X)$ for any set $X$ that $\delta^{\text{in}}(X) = \emptyset$.
+
+	A \textbf{dijoin} is a set of edges that, after contraction, makes the graph strongly connected (i.e. every vertex can reach every other vertex).
+\end{definition}
+
+\begin{claim}[Max-Dicut Packing Min-Dijoin Theorem]
+	The maximum number of edge-disjoint dicuts $\le$ the minimum dijoin.
+\end{claim}
+\begin{proof}
+	Let the maximum number of edge-disjoint dicuts be $k$. Let $D_1, D_2, \ldots, D_k$ be the edge-disjoint dicuts. Let $J$ be a dijoin. Then each dicut $D_i$ must contain at least one edge in $J$. Since the dicuts are edge-disjoint, we have that $k \leq |J|$.
+\end{proof}
