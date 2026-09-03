@@ -1,0 +1,55 @@
+\chapter{Push Relabel for Max Flow}
+
+\section{Setting}
+
+\begin{definition}[$(s,t)$-flow problem]
+  $G = (V,E), U: E \to \mathbb{R}_{\geq 0}$, $s,t \in V$.
+  An $(s,t)$-flow is a function $f: E \to \mathbb{Z}_{\geq 0}$ such that:
+  \begin{itemize}
+    \item Capacity: $0\leq f(e) \leq U(e)$ for all $e \in E$.
+    \item Conservation: $f(\delta^{\text{in}}(v)) = f(\delta^{\text{out}}(v))$ for all $v \neq s,t$.
+    \end{itemize}
+    The value of the flow is $\text{val}(f) = f(\delta^{\text{out}}(s)) - f(\delta^{\text{in}}(s))$.
+\end{definition}
+
+\begin{definition}[$(s,t)$-cut]
+  An $(s,t)$-cut is a partition of $V$ into $A$ and $B$ such that:
+  \begin{itemize}
+    \item $s \in A$ and $t \in B$.
+    \item The capacity (or size) of the cut is $U(\delta^{\text{out}}(A))$.
+  \end{itemize}
+\end{definition}
+
+\begin{theorem}
+  For $B\geq 0$, there's an algorithm that, in $O(mn^2)$ time, either:
+  \begin{itemize}
+    \item Finds an $(s,t)$-flow of value $B$, or
+    \item Finds an $(s,t)$-cut of size $<B$.
+  \end{itemize}
+\end{theorem}
+
+\begin{corollary}
+  The maximum flow is equal to the minimum cut.
+\end{corollary}
+\begin{proof}
+  In last chapter, we have shown that the maximum flow is at most the minimum cut. Now we can use binary search to find the maximum flow. If the maximum flow is $B$, then we can find an $(s,t)$-flow of value $B$ and an $(s,t)$-cut of size $<B+1$. This implies that the minimum cut is at most $B$, which implies that the maximum flow is equal to the minimum cut.
+
+  Alternatively, if max flow is not equal to the min cut, we can find a value between them and run the algorithm. If the algorithm finds a flow of that value, then the max flow is at least that value, which is a contradiction. If the algorithm finds a cut of that value, then the min cut is at most that value, which is also a contradiction.
+\end{proof}
+
+\section{Definitions}
+
+\begin{definition}[Psuedoflow]
+  $f: E \to \mathbb{Z}_{\geq 0}$ is a \textbf{psuedoflow} if it respect the capacity constraints, but not necessarily the conservation constraints.
+\end{definition}
+
+\begin{definition}[Demand Function]
+  $b: V \to \mathbb{Z}$ is a \textbf{demand function}.
+  $f$ \textbf{routes} $b$ if
+  \[ \forall v \in V, f(\delta^{\text{out}}(v)) - f(\delta^{\text{in}}(v)) = b(v). \]
+\end{definition}
+
+\begin{definition}[Excess]
+  $\text{ex}_f(v) = b(v) + f(\delta^{\text{in}}(v)) - f(\delta^{\text{out}}(v))$ is the \textbf{excess} of $v$.
+  We call a vertex to be \textbf{excess} if $\text{ex}_f(v) > 0$ and \textbf{deficit} if $\text{ex}_f(v) < 0$.
+\end{definition}
