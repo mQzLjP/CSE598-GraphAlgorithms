@@ -20,7 +20,7 @@
   \end{itemize}
 \end{definition}
 
-\begin{theorem}
+\begin{theorem}\label{thm:max-flow-min-cut}
   For $B\geq 0$, there's an algorithm that, in $O(mn^2)$ time, either:
   \begin{itemize}
     \item Finds an $(s,t)$-flow of value $B$, or
@@ -37,7 +37,7 @@
   Alternatively, if max flow is not equal to the min cut, we can find a value between them and run the algorithm. If the algorithm finds a flow of that value, then the max flow is at least that value, which is a contradiction. If the algorithm finds a cut of that value, then the min cut is at most that value, which is also a contradiction.
 \end{proof}
 
-\section{Definitions}
+\section{Term Definitions}
 
 \begin{definition}[Psuedoflow]
   $f: E \to \mathbb{Z}_{\geq 0}$ is a \textbf{psuedoflow} if it respect the capacity constraints, but not necessarily the conservation constraints.
@@ -47,9 +47,107 @@
   $b: V \to \mathbb{Z}$ is a \textbf{demand function}.
   $f$ \textbf{routes} $b$ if
   \[ \forall v \in V, f(\delta^{\text{out}}(v)) - f(\delta^{\text{in}}(v)) = b(v). \]
+  In $(s,t)$-flow problem, we have $b(s) = B, b(t) = -B$ and $b(v) = 0$ for all other vertices.
 \end{definition}
 
 \begin{definition}[Excess]
   $\text{ex}_f(v) = b(v) + f(\delta^{\text{in}}(v)) - f(\delta^{\text{out}}(v))$ is the \textbf{excess} of $v$.
   We call a vertex to be \textbf{excess} if $\text{ex}_f(v) > 0$ and \textbf{deficit} if $\text{ex}_f(v) < 0$.
 \end{definition}
+
+\begin{definition}[Residual Graph]
+  The \textbf{residual graph} $G_f$ is a directed graph with the same vertex set as $G$ and edge set
+  \[ E_f = \{(u,v) \in E: f(u,v) < U(u,v)\} \cup \{(v,u): f(u,v) > 0\}. \]
+  The capacity of an edge $(u,v)$ in $G_f$ is defined as:
+  \[ U_f(u,v) = \begin{cases}
+    U(u,v) - f(u,v) & (u,v) \in E,\\
+    f(v,u) & (v,u) \in E.
+  \end{cases} \]
+\end{definition}
+
+\begin{definition}[Height Function]
+  $h: V \to \mathbb{Z}_{\geq 0}$ is a \textbf{height function} if for all $(u,v) \in E_f$, $h(u) \leq h(v) + 1$.
+  Any edge that goes from a higher vertex to a lower vertex is called a \textbf{downhill edge}, or \textbf{admissible edge}.
+\end{definition}
+
+\begin{definition}[Active Vertex]
+  A vertex $v$ is \textbf{active} if $\text{ex}_f(v) > 0$ and $h(v)<n$.
+\end{definition}
+
+\section{Push-Relabel Algorithm}
+
+\begin{algorithm}[H]
+  \caption{Push-Relabel Algorithm}\label{alg:push-relabel}
+  Set $f(e) = 0$ for all $e \in E$ and $h(v) = 0$ for all $v \in V$\;
+  \While{there exists an active vertex $u$}{
+    \If{there exists an admissible edge $(u,v)$}{
+      Push $\max\{U_f(u,v), \text{ex}_f(u)\}$ units of flow from $u$ to $v$\;
+    }
+    \Else{
+      $h(u) \gets h(u)+1$ (relabel)\;
+    }
+  }
+\end{algorithm}
+
+\subsection{Correctness}
+
+We start with some simple claims. It's generally trivial, so we omit the proofs.
+
+\begin{claim}
+  \begin{itemize}
+    \item $f$ is a psuedoflow at all times.
+    \item Only $t$ will be deficit at all times.
+    \item $h(v) \leq n$.
+    \item $h$ is a valid height function (relabeling only occurs when there are no admissible edges).
+    \item $h(t) = 0$.
+    \item Any excess vertex $u$ has a path to $s$ in the residual graph $G_f$.
+  \end{itemize}
+\end{claim}
+\begin{lemma}
+  Algorithm~\ref{alg:push-relabel} is correct.
+\end{lemma}
+\begin{proof}
+  By the end of the algorithm, if there're no excess vertices, then $f$ is a valid flow that routes $b$. 
+
+  Otherwise, if there exists an excess vertex $u$, then we have $h(u) = n$. 
+
+  We denote $V_i = \{v \in V: h(v) = i\}$.
+  As there're $n+1$ distinct integer heights, $\exists i, V_i = \emptyset$. Fix this $i$, and let $X = V_{>i} = \{v \in V: h(v) > i\}$. 
+
+  Then in $G_f$, there're no edges from $X$ to $V\setminus X$, as for any edge $(u,v)$ with $u \in X$ and $v \in V\setminus X$, we have $h(u) \ge i + 1 \ge h(v) + 2$, which implies that $(u,v)$ is not an admissible downhill edge.
+  Also $s\in X$ as mentioned in the claim above, and $t \notin X$ as $h(t) = 0$.
+
+  Then it suffices to prove $U(\delta^{\text{out}}(X)) < B$. We have
+  \[b(X) - U(\delta^{\text{out}}(X)) = b(X) + f(\delta^{\text{in}}(X)) - f(\delta^{\text{out}}(X)) = \text{ex}_f(X) > 0.\]
+
+  As $b(X)\le B$, we have $U(\delta^{\text{out}}(X)) < B$.
+\end{proof}
+
+\subsection{Time Complexity}
+\begin{lemma}
+  Algorithm~\ref{alg:push-relabel} runs in $O(n^2m)$ time.
+\end{lemma}
+\begin{proof}
+  First we trivially see that every vertex is relabeled $\le n$ times.
+
+  We denote a saturated push as pushing $U_f(u,v)$ units of flow, and an unsaturated push as pushing $\text{ex}_f(u)$ units of flow.
+
+  Fix $(u,v)$. After a saturated push, it will disappear from the residual graph, and will only reappear after 2 relabels of $v$ (and $(v,u)$ is then an admissible edge). As there're $\le n$ relabels of $v$, there're $\le n/2$ saturated pushes on $(u,v)$.
+  Thus, there're $\le nm$ saturated pushes in total.
+
+  For unsaturated pushes, we can use a potential function $\Phi = \sum_{v \text{ is active}} h(v)$. 
+
+  After an unsaturated push from $u$ to $v$, $u$ will no longer be active, and $v$ may become active.
+  As $u$ is 1 unit higher than $v$, we have $\Phi$ decreases by at least 1.
+
+  After a relabel of $u$, $\Phi$ increases by at most 1. There're at most $n$ relabels for each vertex, so $\Phi$ increases by at most $n^2$ due to relabels.
+
+  After a saturated push from $u$ to $v$, $v$ may be active, and $\Phi$ increases by at most $n$. There're at most $mn$ saturated pushes, so $\Phi$ increases by at most $mn^2$ due to saturated pushes.
+
+  As $\Phi$ is always non-negative, the number of unsaturated pushes is at most $mn^2 + n^2 = O(mn^2)$.
+
+  In conclusion, the total number of operations is $O(n^2m)$.
+\end{proof}
+
+Combining the correctness and time complexity, we have proved Theorem~\ref{thm:max-flow-min-cut}.
+
