@@ -1,4 +1,115 @@
 \chapter{Min Cost Flow}
 
+\begin{problem}[Min Cost Flow]
+  In a graph with capacities $U$ and costs $c$, the \textbf{cost} of a flow $f$ is defined as
+  \[ \cost(f) = \sum_{e \in E} c(e) f(e) \]
+  Given integral graph $G, b$. Either
+  \begin{enumerate}
+    \item find a flow $f$ that routes $b$ and minimizes $\cost(f)$, or
+    \item report that no such flow exists.
+  \end{enumerate}
+\end{problem}
+
+\section{Notations}
+
+Here we introduce more notations, and update some of the notations from the previous chapter. All other notations remain the same.
+
 \begin{definition}[Net Flow]
+  \[ f^{\text{net}}(v) = f^{\text{in}}(v) - f^{\text{out}}(v) \]
+  $f$ routes $b$ if $f^{\text{net}}(v) + b(v) = 0$ for all $v \in V$.
+  The excess of $f$ at $v$ is $\ex_f(v) = b(v) - f^{\text{net}}(v)$.
 \end{definition}
+
+\begin{definition}[Residual Graph]
+  Fix $G,f$. The \textbf{residual graph} $G_f = (V,E_f)$ where $\forall e = (u,v)$:
+  \begin{itemize}
+    \item If $f(e) < U(e)$, then $(u,v) \in E_f$ with capacity $U_f(u,v) = U(u,v) - f(u,v)$ and cost $c_f(u,v) = c(u,v)$.
+    \item If $f(e) > 0$, then $(v,u) \in E_f$ with capacity $U_f(v,u) = f(u,v)$ and cost $c_f(v,u) = -c(u,v)$ (as we intend to reverse such flow).
+  \end{itemize}
+\end{definition}
+
+\begin{definition}[Circulation]
+  A flow $f$ is a \textbf{circulation} if it routes $b = 0$.
+  It might be many cycles added together, in this case:
+  \[ f = \sum_i \alpha_i \mathbb{1}_{C_i} \]
+  \[ \cost(f) = \sum_i \alpha_i \cost(C_i) \]
+  where $C_i$ is a cycle and $\alpha_i$ is the amount of flow on that cycle.
+  It's trivial that we can compute the cost of a circulation in $O(m^2)$ time.
+\end{definition}
+
+\section{Optimality Conditions}
+
+\begin{lemma}[OPT certificate]
+  Let $f$ route $b$.
+  Then $f$ has minimum cost if and only if there is no negative cost cycle in $G_f$.
+\end{lemma}
+\begin{proof}
+  If there is a negative cost cycle $C$ in $G_f$, then we can augment flow along $C$ to get a new flow $f'$ that routes $b$ and has lower cost than $f$.
+
+  Conversely, if $f$ is not optimal, then there exists a flow $f'$ that routes $b$ and has lower cost than $f$.
+  Let $g = f' - f$. First we claim $g$ is respecting capacity of $G_f$, as we can first revert $G_f$ to $G$ by applying $-f$, and then find that $f'$ is respecting capacity of $G$.
+
+  Also, $g$ itself is a circulation (as $b$ cancels out), and $\cost(g) = \cost(f') - \cost(f) < 0$.
+  Then we can decompose $g$ into cycles, and at least one of them must have negative cost.
+\end{proof}
+
+\begin{definition}[Reduced Cost]
+  Fix height $h: V \to \mathbb{R}$.
+  For a residual edge $a = (u,v)\in E_f$, the \textbf{reduced cost} of $a$ is defined as
+  \[ c_{f,h}(a) = c_f(a) - h(u) + h(v) \]
+
+  Similar to previous chapter, $c_f$ can be called as downhill length, and $c_{f,h}$ as downhill slack.
+
+  In a path $P$, $c_{f,h}(P) = c_f(P) - h(u) + h(v)$ where $u$ is the start of $P$ and $v$ is the end of $P$.
+
+  In a cycle $C$, $c_{f,h}(C) = c_f(C)$.
+\end{definition}
+
+\begin{definition}[$\varepsilon$-optimality]
+  $(f,h)$ is $\varepsilon$-optimal if $c_{f,h}(a) \geq -\varepsilon$ for all $a \in E_f$.
+\end{definition}
+
+\begin{lemma}
+  Let $f$ be a feasible flow (a.k.a. routes $b$).
+
+  If $(f,h)$ is $\varepsilon$-optimal when $\varepsilon < 1/n$, then there's no negative cycle in $G_f$ (which implies $f$ is optimal).
+\end{lemma}
+\begin{proof}
+  Suppose there's a negative cycle $Q$ in $G_f$. Then $c_f(Q) \le -1$.
+  
+  However as $(f,h)$ is $\varepsilon$-optimal, we have $c_f(Q) = c_{f,h}(Q) \ge |Q| \cdot (-\varepsilon) \ge -n \cdot \varepsilon > -1 \implies \contra$.
+\end{proof}
+
+\section{Algorithm}
+\begin{algorithm}
+  \caption{Init}
+  $\varepsilon \gets \frac{1}{n+1}$\;
+  $\forall v \in V: h(v) \gets 0$\;
+  $f(e) \gets \begin{cases}
+    0 & \text{if } c(e) \ge 0 \\
+    U(e) & \text{if } c(e) < 0
+  \end{cases}$\;
+\end{algorithm}
+In this way we can start with a residual graph with non-negative costs.
+
+\begin{definition}[Active and Admissible]
+  A vertex $v$ is \textbf{active} if $\ex_f(v) > 0$.
+
+  An edge $(u,v)$ is \textbf{admissible} if $c_{f,h}(u,v) < 0$.
+\end{definition}
+
+\begin{algorithm}[h]
+  \caption{Min Cost Flow}\label{alg:min-cost-flow}
+  Run Algorithm~\ref{alg:push-relabel} and report if no flow is found\;
+  \While{$\exists$ active $u$}{
+  \eIf{$\exists$ admissible edge $(u,v)$}{
+      Push $\min\{U_f(u,v), \ex_f(u)\}$ units of flow from $u$ to $v$\;
+    }{
+      $h(u) \gets h(u) + 1$\;
+    }
+  }
+  \Return $f$\;
+\end{algorithm}
+
+\subsection{correctness}
+
