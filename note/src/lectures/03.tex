@@ -105,13 +105,13 @@ In this way we can start with a residual graph with non-negative costs.
   \eIf{$\exists$ admissible edge $(u,v)$}{
       Push $\min\{U_f(u,v), \ex_f(u)\}$ units of flow from $u$ to $v$\;
     }{
-      $h(u) \gets h(u) + 1$\;
+      $h(u) \gets h(u) + \varepsilon$\;
     }
   }
   \Return $f$\;
 \end{algorithm}
 
-\subsection{correctness}
+\subsection{Correctness}
 
 First of all we claim some of the invariants of the algorithm.
 
@@ -120,6 +120,46 @@ First of all we claim some of the invariants of the algorithm.
   \begin{itemize}
     \item $f$ is integral and respecting capacity. There're no new deficit vertices introduced.
     \item $(f,h)$ is $\varepsilon$-optimal.
+      \begin{itemize}
+        \item Initially, $c_{f,h}(a) \ge 0$ for all $a \in E_f$.
+        \item When we relabel a vertex $u$, there's no admissible edges incident to it, so $\forall (u,v) \in E_f: c_{f,h}(u,v) \ge 0$. After a relabel, the new reduced cost will be at least $-\varepsilon$.
+        \item When we push an edge, we always push along an edge that has a negative reduced cost, and bring a reverse edge with positive reduced cost. So the new reduced costs will still be at least $-\varepsilon$.
+        \end{itemize}
+    \item Any deficit vertex $v$ has $h(v) = 0$.
   \end{itemize}
 \end{lemma}
+
+Then it suffices to show that the height is upper-bounded (and thus the algorithm will halt).
+
+\begin{lemma}
+  The maximum height of any vertex is at most $n \cdot (C_{\max} + 1)$, where $C_{\max} = \max_{e \in E} |c(e)|$.
+\end{lemma}
+\begin{proof}
+  First we claim there must be a path from any excess vertex $u$ to a deficit vertex $v$.
+  Otherwise, assume a set $S$ that contains all reachable vertices from $u$ in $G_f$. Then
+  \begin{align*}
+    \ex_f(S) &= b(S) - f^{\text{out}}(S) + f^{\text{in}}(S) \\
+             &= b(S) - U(\delta^{\text{out}}(S)) + 0 \\
+             &\le 0
+  \end{align*}
+  which contradicts the fact that $\ex_f(u) > 0 \implies \ex_f(S) > 0$.
+
+  Now we fix such a path $P$ from $u$ to $v$. Then we have
+  \begin{align*}
+    -\varepsilon \cdot |P| &\le c_{f,h}(P) \\
+                           &= c_f(P) - h(u) + h(v) \\
+                           \implies h(u) &\le c_f(P) + \varepsilon \cdot |P| \\
+                                         &\le |P| \cdot C_{\max} + |P| \cdot \varepsilon \\
+                                         &\le n(C_{\max} + \varepsilon) \le n(C_{\max} + 1)
+              \end{align*}
+\end{proof}
+
+\begin{corollary}
+  Every vertex is relabeled at most $L \le n(C_{\max} + 1)/\varepsilon = O(n^2 C_{\max})$ times.
+\end{corollary}
+
+\subsection{Time}
+
+Similar to the previous chapter, there're at most $nL$ relabels, $mL$ saturated pushes and $mnL$ unsaturated pushes. Each of them takes $O(1)$ time, so the total time is $O(mnL) = O(m n^3 C_{\max})$.
+
 
