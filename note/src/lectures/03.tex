@@ -15,9 +15,9 @@
 Here we introduce more notations, and update some of the notations from the previous chapter. All other notations remain the same.
 
 \begin{definition}[Net Flow]
-	\[ f^{\text{net}}(v) = f^{\text{in}}(v) - f^{\text{out}}(v) \]
-	$f$ routes $b$ if $f^{\text{net}}(v) + b(v) = 0$ for all $v \in V$.
-	The excess of $f$ at $v$ is $\ex_f(v) = b(v) - f^{\text{net}}(v)$.
+  \[ f^{\text{net}}(v) = f^{\text{in}}(v) - f^{\text{out}}(v) \]
+  $f$ routes $b$ if $f^{\text{net}}(v) + b(v) = 0$ for all $v \in V$.
+  The excess of $f$ at $v$ is $\ex_f(v) = b(v) + f^{\text{net}}(v)$.
 \end{definition}
 
 \begin{definition}[Residual Graph]
@@ -135,15 +135,14 @@ Then it suffices to show that the height is upper-bounded (and thus the algorith
 	The maximum height of any vertex is at most $n \cdot (C_{\max} + 1)$, where $C_{\max} = \max_{e \in E} |c(e)|$.
 \end{lemma}
 \begin{proof}
-	First we claim there must be a path from any excess vertex $u$ to a deficit vertex $v$.
-	Otherwise, assume a set $S$ that contains all reachable vertices from $u$ in $G_f$. Then
-	\begin{align*}
-		\ex_f(S) & = b(S) - f^{\text{out}}(S) + f^{\text{in}}(S) \\
-		         & = b(S) - U(\delta^{\text{out}}(S)) + 0        \\
-		         & \le 0
-	\end{align*}
-	which contradicts the fact that $\ex_f(u) > 0 \implies \ex_f(S) > 0$.
-	(Note: $b(S)\le U(\delta^{\text{out}}(S))$ because otherwise we can never route $b(S)$ out of $S$.)
+  First we claim there must be a path from any excess vertex $u$ to a deficit vertex $v$ in the residual graph $G_f$.
+  Otherwise, assume a set $S$ that contains all reachable vertices from $u$ in $G_f$. Then
+  \begin{align*}
+    \ex_f(S) &= b(S) - f^{\text{out}}(S) + f^{\text{in}}(S) \\
+             &= b(S) - U(\delta^{\text{out}}(S)) + 0 \\
+             &\le 0
+  \end{align*}
+  which contradicts the fact that $\ex_f(u) > 0 \implies \ex_f(S) > 0$.
 
 	Now we fix such a path $P$ from $u$ to $v$. Then we have
 	\begin{align*}
