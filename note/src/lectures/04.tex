@@ -1,4 +1,4 @@
-\section{Improvement}
+\section{Improvements}
 
 We want to improve $L$ so that $L = O(n\log (nC_{\max}))$.
 
@@ -29,3 +29,63 @@ But how can we continue from a solution with $\varepsilon$ to a solution with $\
 	Therefore, we have
 	\[ \cost_G(f+x) = \cost_G(f) + \cost_{G_{f,h}}(x) + \sum_{v\in V} h(v) \cdot \ex_f(v). \]
 \end{proof}
+
+Then we want to find suitable $(f,h)$.
+
+\begin{definition}
+	For $G$,
+	\[ \Delta(G) = \max(\{0\}\cup\{-c(e)\}_{e \in E}) \]
+
+	Then $(f,h)$ is $\varepsilon$-optimal if $\forall e, c_{f,h}(e) \geq -\varepsilon \iff \Delta(G_{f,h}) \leq \varepsilon$.
+    
+\end{definition}
+
+\begin{theorem} \label{thm:refine}
+	Given $G$ with (not necessarily integral) costs, there exists an algorithm $\mathsf{Refine}(G)$ that returns $(f,h)$ such that
+	\[ \Delta(G_{f,h}) \leq \frac{\Delta(G)}{2}\]
+	in time $O(mn^2)$.
+\end{theorem}
+
+For now we assume Theorem~\ref{thm:refine} is true, and we will prove it later.
+
+\subsection{Cost Scaling}
+
+Consider the following Successive Approximation Algorithm:
+
+\begin{algorithm}[H]
+	\caption{Successive Approximation}
+	\label{alg:successive-approximation}
+	Find flow $f_0$ routing $b$ (or report infeasible) in $G$\;
+	Set $h_0\gets 0$, $G^{(0)} \gets G$\;
+	\ForEach{$i = 1,2,\ldots$ until $\Delta(G^{(i)}) < 1/n$}{
+	  $(f_{i},h_{i}) \gets \mathsf{Refine}(G^{(i)})$\;
+		$G^{(i)} \gets G^{(i-1)}_{f_{i},h_{i}}$\;
+	}
+	\Return $f^* = f_0 + f_1 + \cdots + f_i$ and $h^* = h_0+h_1+\cdots+h_i$\;
+\end{algorithm}
+
+For correctness, it suffices to prove the following lemma:
+\begin{lemma}
+	For $(f,h)$ in graph $H$, let $H' = H_{f,h}$.
+	Let $(f',h')$ in $H'$.
+
+	Then $H'_{f',h'} = H_{f+f',h+h'}$.
+\end{lemma}
+
+The proof is simply calculation regarding the definitions of $H_{f,h}$ and $H'_{f',h'}$, so we omit it.
+    
+\subsection{Refine Algorithm}
+
+
+The algorithm $\mathsf{Refine}(G)$ is as follows:
+
+\begin{algorithm}[H]
+	\caption{$\mathsf{Refine}(G)$}
+	\label{alg:refine}
+	$\varepsilon \gets \Delta(G)/2$\;
+	$b\gets 0$, $h\gets 0$\;
+	$f(e)\gets\begin{cases}
+		u(e) & \text{if $c(e) < 0$} \\
+		0    & \text{otherwise}
+	\end{cases}$\;
+\end{algorithm}
