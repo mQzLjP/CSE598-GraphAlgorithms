@@ -12,7 +12,20 @@ But how can we continue from a solution with $\varepsilon$ to a solution with $\
 	Moreover, $\cost_G(f+x) = \cost_{G}(f) + \cost_{G_{f,h}}(x) + \sum_{v \in V} h(v) \cdot \ex_f(v)$.
 \end{lemma}
 \begin{proof}
-	% We have $\ex_{f+x}(v) = \ex_f(v) + \ex_x(v) = b(v)$ for all $v \in V$.
-	% And $\cost_G(f+x) = \sum_{a \in E} c(a) \cdot (f(a)+x(a)) = \cost_G(f) + \cost_G(x)$.
-	% And $\cost_G(x) = \cost_{G_{f,h}}(x) + \sum_{v \in V} h(v) \cdot \ex_f(v)$.
+	Since $(f+x)^{\text{net}} = f^{\text{net}} + x^{\text{net}}$, we have
+	\[ b+(f+x)^{\text{net}} = b+f^{\text{net}} + x^{\text{net}} = \ex_f + x^{\text{net}}. \]
+	So $f+x$ is a flow in $G$ routing $b$ if and only if $x$ is a flow in $G_{f,h}$ routing $\ex_f$.
+
+	Also, as $ \cost_G(f+x) = \cost_G(f)+\cost_{G_f}(x) $ by construction, and by definition, $\forall e = (u,v) \in E: c_{f,h}(e) = c_f(e) - h(u) + h(v)$, we have
+
+	\begin{align*}
+		\sum_{e \in E} c_f(e) \cdot x(e) & = \sum_{e = (u,v) \in E} (c_{f,h}(e) + h(u) - h(v)) \cdot x(e)                                    \\
+		                                 & = \cost_{G_{f,h}}(x) + \sum_{e=(u,v) \in E} (h(u) - h(v)) \cdot x(e)                              \\
+		                                 & = \cost_{G_{f,h}}(x) + \sum_{v \in V} h(v) \cdot (x^{\text{out}}(v) - x^{\text{in}}(v))           \\
+		                                 & = \cost_{G_{f,h}}(x) - \sum_{v\in V} h(v) \cdot x^{\text{net}}(v)                                 \\
+		                                 & = \cost_{G_{f,h}}(x) + \sum_{v\in V} h(v) \cdot \ex_f(v) \quad \text{(since $x$ routes $\ex_f$).}
+	\end{align*}
+
+	Therefore, we have
+	\[ \cost_G(f+x) = \cost_G(f) + \cost_{G_{f,h}}(x) + \sum_{v\in V} h(v) \cdot \ex_f(v). \]
 \end{proof}
