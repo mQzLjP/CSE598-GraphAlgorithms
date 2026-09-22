@@ -1,0 +1,18 @@
+\section{Improvement}
+
+We want to improve $L$ so that $L = O(n\log (nC_{\max}))$.
+
+The current plan is that we do multiple rounds of Algorithm~\ref{alg:min-cost-flow}, with decreasing $\varepsilon$ values, e.g. $\varepsilon = C_{\max}, C_{\max}/2, C_{\max}/4, \ldots, 1/(n+1)$.
+But how can we continue from a solution with $\varepsilon$ to a solution with $\varepsilon/2$? We can use the following lemma.
+
+\begin{lemma}
+	Fix $(f,h)$.
+	Then $x$ is a flow in $G_{f,h}$ routing $\ex_f = b+f^{\text{net}}$ if and only if $f+x$ is a flow in $G$ routing $b$.
+
+	Moreover, $\cost_G(f+x) = \cost_{G}(f) + \cost_{G_{f,h}}(x) + \sum_{v \in V} h(v) \cdot \ex_f(v)$.
+\end{lemma}
+\begin{proof}
+	% We have $\ex_{f+x}(v) = \ex_f(v) + \ex_x(v) = b(v)$ for all $v \in V$.
+	% And $\cost_G(f+x) = \sum_{a \in E} c(a) \cdot (f(a)+x(a)) = \cost_G(f) + \cost_G(x)$.
+	% And $\cost_G(x) = \cost_{G_{f,h}}(x) + \sum_{v \in V} h(v) \cdot \ex_f(v)$.
+\end{proof}
