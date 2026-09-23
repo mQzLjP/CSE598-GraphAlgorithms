@@ -74,8 +74,11 @@ For correctness, it suffices to prove the following lemma:
 
 The proof is simply calculation regarding the definitions of $H_{f,h}$ and $H'_{f',h'}$, so we omit it.
     
-\subsection{Refine Algorithm}
+Then $G^{(i)} = G_{f^*,h^*}$. We see that $f^*$ is the minimum cost flow routing $b$ because $f^*$ routes $b$, and $\Delta(G_{f^*,h^*}) < 1/n$ implies that $f^*$ is optimal by Lemma~\ref{lem:eps-optimal}.
 
+If Theorem~\ref{thm:refine} is true, the running time of Algorithm~\ref{alg:successive-approximation} is $O(mn^2 \log(nC_{\max}))$ as desired.
+
+\subsection{Refine Algorithm}
 
 The algorithm $\mathsf{Refine}(G)$ is as follows:
 
@@ -85,7 +88,31 @@ The algorithm $\mathsf{Refine}(G)$ is as follows:
 	$\varepsilon \gets \Delta(G)/2$\;
 	$b\gets 0$, $h\gets 0$\;
 	$f(e)\gets\begin{cases}
-		u(e) & \text{if $c(e) < 0$} \\
+		U(e) & \text{if $c(e) < 0$} \\
 		0    & \text{otherwise}
 	\end{cases}$\;
+	\While{$\exists$ active $u$}{
+		\eIf{$\exists$ admissible edge $(u,v)$}{
+			Push $\min\{U_f(u,v), \ex_f(u)\}$ units of flow from $u$ to $v$\;
+		}{
+			$h(u) \gets h(u) + \varepsilon$\;
+		}
+	}
+	\Return $(f,h)$\;
 \end{algorithm}
+
+Other than value of $\varepsilon$, the algorithm is the same as Algorithm~\ref{alg:min-cost-flow}.
+The invariants remain the same, so we omit the correctness proof here.
+
+\begin{lemma}
+    The maximum height of any vertex is at most $1.5 n \cdot \Delta(G)$.
+\end{lemma}
+\begin{proof}
+	Consider $u$ with excess $\ex_f(u) > 0$.
+	Then $u$ is active, and there exists a path $P$ from $u$ to some deficit vertex $z$ in $G_f$ as we proved before.
+	So,
+	\[ h(u) \le h(z) + c_f(P) + |P| \cdot \varepsilon \le 0 + n \cdot \Delta(G) + n \cdot \frac{\Delta(G)}{2} = 1.5 n \cdot \Delta(G). \]
+\end{proof}
+
+Therefore, the number of relabel operations for a single vertex is $L = O(n \cdot \Delta(G)/\varepsilon) = O(n)$. Similar to what we did for Max Flow, we can show that the total number of relabels are $O(nL) = O(n^2)$, the number of unsaturating pushes is at most $O(mL) = O(nm)$, and the number of saturating pushes is at most $O(mnL)=O(n^2 m)$. 
+So the total running time of $\mathsf{Refine}(G)$ is $O(n^2 m)$, which proves Theorem~\ref{thm:refine}.
