@@ -37,7 +37,7 @@ Then we want to find suitable $(f,h)$.
 	\[ \Delta(G) = \max(\{0\}\cup\{-c(e)\}_{e \in E}) \]
 
 	Then $(f,h)$ is $\varepsilon$-optimal if $\forall e, c_{f,h}(e) \geq -\varepsilon \iff \Delta(G_{f,h}) \leq \varepsilon$.
-    
+
 \end{definition}
 
 \begin{theorem} \label{thm:refine}
@@ -58,7 +58,7 @@ Consider the following Successive Approximation Algorithm:
 	Find flow $f_0$ routing $b$ (or report infeasible) in $G$\;
 	Set $h_0\gets 0$, $G^{(0)} \gets G$\;
 	\ForEach{$i = 1,2,\ldots$ until $\Delta(G^{(i)}) < 1/n$}{
-	  $(f_{i},h_{i}) \gets \mathsf{Refine}(G^{(i)})$\;
+		$(f_{i},h_{i}) \gets \mathsf{Refine}(G^{(i-1)})$\;
 		$G^{(i)} \gets G^{(i-1)}_{f_{i},h_{i}}$\;
 	}
 	\Return $f^* = f_0 + f_1 + \cdots + f_i$ and $h^* = h_0+h_1+\cdots+h_i$\;
@@ -73,7 +73,7 @@ For correctness, it suffices to prove the following lemma:
 \end{lemma}
 
 The proof is simply calculation regarding the definitions of $H_{f,h}$ and $H'_{f',h'}$, so we omit it.
-    
+
 Then $G^{(i)} = G_{f^*,h^*}$. We see that $f^*$ is the minimum cost flow routing $b$ because $f^*$ routes $b$, and $\Delta(G_{f^*,h^*}) < 1/n$ implies that $f^*$ is optimal by Lemma~\ref{lem:eps-optimal}.
 
 If Theorem~\ref{thm:refine} is true, the running time of Algorithm~\ref{alg:successive-approximation} is $O(mn^2 \log(nC_{\max}))$ as desired.
@@ -90,7 +90,7 @@ The algorithm $\mathsf{Refine}(G)$ is as follows:
 	$f(e)\gets\begin{cases}
 		U(e) & \text{if $c(e) < 0$} \\
 		0    & \text{otherwise}
-	\end{cases}$\;
+		\end{cases}$\;
 	\While{$\exists$ active $u$}{
 		\eIf{$\exists$ admissible edge $(u,v)$}{
 			Push $\min\{U_f(u,v), \ex_f(u)\}$ units of flow from $u$ to $v$\;
@@ -105,7 +105,7 @@ Other than value of $\varepsilon$, the algorithm is the same as Algorithm~\ref{a
 The invariants remain the same, so we omit the correctness proof here.
 
 \begin{lemma}
-    The maximum height of any vertex is at most $1.5 n \cdot \Delta(G)$.
+	The maximum height of any vertex is at most $1.5 n \cdot \Delta(G)$.
 \end{lemma}
 \begin{proof}
 	Consider $u$ with excess $\ex_f(u) > 0$.
@@ -114,5 +114,5 @@ The invariants remain the same, so we omit the correctness proof here.
 	\[ h(u) \le h(z) + c_f(P) + |P| \cdot \varepsilon \le 0 + n \cdot \Delta(G) + n \cdot \frac{\Delta(G)}{2} = 1.5 n \cdot \Delta(G). \]
 \end{proof}
 
-Therefore, the number of relabel operations for a single vertex is $L = O(n \cdot \Delta(G)/\varepsilon) = O(n)$. Similar to what we did for Max Flow, we can show that the total number of relabels are $O(nL) = O(n^2)$, the number of unsaturating pushes is at most $O(mL) = O(nm)$, and the number of saturating pushes is at most $O(mnL)=O(n^2 m)$. 
+Therefore, the number of relabel operations for a single vertex is $L = O(n \cdot \Delta(G)/\varepsilon) = O(n)$. Similar to what we did for Max Flow, we can show that the total number of relabels are $O(nL) = O(n^2)$, the number of unsaturating pushes is at most $O(mL) = O(nm)$, and the number of saturating pushes is at most $O(mnL)=O(n^2 m)$.
 So the total running time of $\mathsf{Refine}(G)$ is $O(n^2 m)$, which proves Theorem~\ref{thm:refine}.
